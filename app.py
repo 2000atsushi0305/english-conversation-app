@@ -182,7 +182,8 @@ def refresh_user(user_id):
 def reset_usage_if_needed(user):
     """Reset usage count at the start of a new calendar month."""
     today = date.today()
-    reset_date = date.fromisoformat(user["usage_reset_at"])
+    raw = user["usage_reset_at"]
+    reset_date = raw if isinstance(raw, date) else date.fromisoformat(raw)
     if today.year != reset_date.year or today.month != reset_date.month:
         new_reset = date(today.year, today.month, 1).isoformat()
         with get_db() as conn:
