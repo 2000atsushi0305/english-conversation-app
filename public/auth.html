@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AI英会話 - ログイン</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-container">
+    <div class="auth-logo">
+      <h1>🎙️ AI英会話</h1>
+      <p>AIと英語で話して、どんどん上達しよう</p>
+    </div>
+
+    <div class="auth-card">
+      <!-- Tab -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">ログイン</button>
+        <button class="auth-tab" data-tab="register">新規登録</button>
+      </div>
+
+      <!-- Login form -->
+      <form id="login-form" class="auth-form">
+        <div class="auth-field">
+          <label>メールアドレス</label>
+          <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label>パスワード</label>
+          <div class="password-wrap">
+            <input type="password" id="login-password" placeholder="パスワード" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" data-target="login-password">👁</button>
+          </div>
+        </div>
+        <div id="login-error" class="auth-error hidden"></div>
+        <button type="submit" class="auth-submit">ログイン</button>
+      </form>
+
+      <!-- Register form -->
+      <form id="register-form" class="auth-form hidden">
+        <div class="auth-field">
+          <label>メールアドレス</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label>パスワード（6文字以上）</label>
+          <div class="password-wrap">
+            <input type="password" id="reg-password" placeholder="パスワード" required autocomplete="new-password">
+            <button type="button" class="pw-toggle" data-target="reg-password">👁</button>
+          </div>
+        </div>
+        <div id="register-error" class="auth-error hidden"></div>
+        <button type="submit" class="auth-submit">登録してはじめる</button>
+        <p class="auth-note">無料プランで月30回まで利用できます。</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll(".auth-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const target = tab.dataset.tab;
+        document.getElementById("login-form").classList.toggle("hidden", target !== "login");
+        document.getElementById("register-form").classList.toggle("hidden", target !== "register");
+      });
+    });
+
+    // Password visibility toggle
+    document.querySelectorAll(".pw-toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.dataset.target);
+        const show  = input.type === "password";
+        input.type  = show ? "text" : "password";
+        btn.textContent = show ? "🙈" : "👁";
+      });
+    });
+
+    function showError(elId, msg) {
+      const el = document.getElementById(elId);
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function clearError(elId) {
+      document.getElementById(elId).classList.add("hidden");
+    }
+
+    async function postJSON(url, body) {
+      const res  = await fetch(url, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(body),
+      });
+      // サーバーエラー時も JSON でなくHTMLが返る場合があるので安全にパース
+      try { return { res, data: await res.json() }; }
+      catch { return { res, data: { error: `サーバーエラー (${res.status})` } }; }
+    }
+
+    // Login
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError("login-error");
+      const btn = e.target.querySelector("button[type=submit]");
+      btn.disabled = true;
+      btn.textContent = "ログイン中…";
+
+      const { res, data } = await postJSON("/api/login", {
+        email:    document.getElementById("login-email").value,
+        password: document.getElementById("login-password").value,
+      });
+      if (data.ok) {
+        location.href = "/";
+      } else {
+        showError("login-error", data.error || "ログインに失敗しました");
+        btn.disabled = false;
+        btn.textContent = "ログイン";
+      }
+    });
+
+    // Register
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError("register-error");
+      const btn = e.target.querySelector("button[type=submit]");
+      btn.disabled = true;
+      btn.textContent = "登録中…";
+
+      const { res, data } = await postJSON("/api/register", {
+        email:    document.getElementById("reg-email").value,
+        password: document.getElementById("reg-password").value,
+      });
+      if (data.ok) {
+        location.href = "/";
+      } else {
+        showError("register-error", data.error || "登録に失敗しました");
+        btn.disabled = false;
+        btn.textContent = "登録してはじめる";
+      }
+    });
+  </script>
+</body>
+</html>

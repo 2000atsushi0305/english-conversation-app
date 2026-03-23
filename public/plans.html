@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AI英会話 - プラン</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="auth-body">
+
+  <div class="plans-container">
+    <div class="plans-header">
+      <a href="/" class="plans-back">← 戻る</a>
+      <h1>🎙️ AI英会話</h1>
+      <p>シンプルな料金プラン</p>
+    </div>
+
+    <div class="plans-grid">
+
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">無料プラン</div>
+        <div class="plan-price">¥0<span>/月</span></div>
+        <ul class="plan-features">
+          <li>✅ 月30回まで会話</li>
+          <li>✅ 全テーマ利用可能</li>
+          <li>✅ 全難易度対応</li>
+          <li>✅ 文法チェック</li>
+          <li>✅ 音声入力・読み上げ</li>
+          <li class="plan-disabled">❌ 月30回を超える利用</li>
+        </ul>
+        <a href="/" class="plan-btn plan-btn-secondary">このまま使う</a>
+      </div>
+
+      <!-- Premium -->
+      <div class="plan-card plan-card-featured">
+        <div class="plan-badge">おすすめ</div>
+        <div class="plan-name">プレミアムプラン</div>
+        <div class="plan-price">¥480<span>/月</span></div>
+        <ul class="plan-features">
+          <li>✅ <strong>会話回数 無制限</strong></li>
+          <li>✅ 全テーマ利用可能</li>
+          <li>✅ 全難易度対応</li>
+          <li>✅ 文法チェック</li>
+          <li>✅ 音声入力・読み上げ</li>
+          <li>✅ 毎日使っても¥16/日</li>
+        </ul>
+        <button class="plan-btn plan-btn-primary" data-plan="premium">アップグレード</button>
+      </div>
+
+    </div>
+
+    <p class="plans-note">
+      ※ 決済機能は準備中です。公開まで今しばらくお待ちください。
+    </p>
+  </div>
+
+  <script>
+    document.querySelectorAll(".plan-btn-primary[data-plan]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const plan = btn.dataset.plan;
+        btn.disabled = true;
+        btn.textContent = "処理中…";
+
+        const res  = await fetch("/api/stripe/checkout", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ plan }),
+        });
+        const data = await res.json();
+
+        if (data.url) {
+          location.href = data.url;
+        } else if (res.status === 401) {
+          location.href = "/auth";
+        } else {
+          alert(data.error || "エラーが発生しました。もう一度お試しください。");
+          btn.disabled = false;
+          btn.textContent = "アップグレード";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

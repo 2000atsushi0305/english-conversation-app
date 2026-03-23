@@ -1,0 +1,15 @@
+# データベース（ユーザー情報が入るので除外）
+data.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+
+# macOS
+.DS_Store
+
+# ログ
+logs/
+*.log

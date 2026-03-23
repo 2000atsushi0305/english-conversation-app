@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AI英会話</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="header-left">
+        <h1>🎙️ AI英会話</h1>
+      </div>
+      <div class="header-right">
+        <div id="usage-badge" class="usage-badge hidden" title="今月の残り回数"></div>
+        <button id="history-btn" class="icon-btn" title="会話履歴">📚</button>
+        <button id="settings-btn" class="icon-btn" title="設定">⚙️</button>
+        <button id="logout-btn" class="icon-btn" title="ログアウト">👤</button>
+      </div>
+    </header>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-row">
+        <label class="settings-label">テーマ</label>
+        <select id="theme-select" class="settings-select">
+          <option value="daily">💬 日常会話</option>
+          <option value="travel">✈️ 旅行</option>
+          <option value="business">💼 ビジネス</option>
+          <option value="hobbies">🎮 趣味・エンタメ</option>
+          <option value="food">🍜 食べ物・料理</option>
+          <option value="movies">🎬 映画・音楽</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label">難易度</label>
+        <div class="diff-buttons">
+          <button class="diff-btn" data-level="beginner">初級</button>
+          <button class="diff-btn active" data-level="intermediate">中級</button>
+          <button class="diff-btn" data-level="advanced">上級</button>
+        </div>
+      </div>
+      <button id="new-chat-btn" class="btn-new-chat">🔄 新しい会話を始める</button>
+    </div>
+
+    <!-- Session info bar -->
+    <div id="session-info" class="session-info hidden">
+      <span id="session-theme-label"></span>
+      <span class="session-sep">・</span>
+      <span id="session-diff-label"></span>
+    </div>
+
+    <!-- Chat -->
+    <div id="chat-area">
+      <div id="messages"></div>
+    </div>
+
+    <!-- Input -->
+    <div id="input-area">
+      <div id="voice-status" class="voice-status hidden">
+        <span class="recording-dot"></span> 聞いています… もう一度押すと送信
+      </div>
+      <div class="input-row">
+        <input type="text" id="text-input"
+          placeholder="英語を入力 または 🎙️ で音声入力"
+          autocomplete="off" />
+        <button id="send-btn" class="btn btn-send" title="送信">➤</button>
+        <button id="mic-btn" class="btn btn-mic" title="押して録音 → もう一度押して送信">🎙️</button>
+      </div>
+      <div id="speech-preview" class="speech-preview hidden"></div>
+    </div>
+
+    <!-- TTS -->
+    <div id="tts-controls">
+      <label class="toggle-label">
+        <input type="checkbox" id="tts-toggle" checked>
+        <span>読み上げ</span>
+      </label>
+      <select id="voice-select"></select>
+    </div>
+
+  </div><!-- .container -->
+
+  <!-- History Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden"></div>
+  <div id="history-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📚 会話履歴</h2>
+        <button id="history-close" class="icon-btn">✕</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <script src="/public/app.js"></script>
+</body>
+</html>

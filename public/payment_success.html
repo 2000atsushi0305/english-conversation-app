@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI英会話 - 支払い完了</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-container" style="text-align:center;">
+    <div class="auth-card" style="padding:40px 24px;">
+      <div style="font-size:3rem;margin-bottom:16px;">🎉</div>
+      <h2 style="font-size:1.3rem;color:#333;margin-bottom:10px;">ご登録ありがとうございます！</h2>
+      <p style="font-size:0.88rem;color:#666;line-height:1.7;margin-bottom:24px;">
+        プランのアップグレードが完了しました。<br>
+        引き続きAI英会話をお楽しみください。
+      </p>
+      <div id="countdown" style="font-size:0.8rem;color:#aaa;margin-bottom:20px;">
+        3秒後に自動でアプリへ移動します…
+      </div>
+      <a href="/" class="auth-submit" style="display:block;text-decoration:none;">
+        今すぐアプリへ →
+      </a>
+    </div>
+  </div>
+  <script>
+    let n = 3;
+    const el = document.getElementById("countdown");
+    const t = setInterval(() => {
+      n--;
+      if (n <= 0) { clearInterval(t); location.href = "/"; }
+      else el.textContent = `${n}秒後に自動でアプリへ移動します…`;
+    }, 1000);
+  </script>
+</body>
+</html>
