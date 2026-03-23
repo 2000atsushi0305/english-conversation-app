@@ -71,6 +71,7 @@ Always respond in the following JSON format:
 {{
   "english": "Your English response here",
   "japanese_translation": "日本語訳をここに書く",
+  "corrected_input": "If the user's message contains obvious speech recognition errors (wrong homophones, misheard words), write the corrected version in English. Otherwise null.",
   "correction": "If the user made a grammar mistake, write the correction and a brief explanation in Japanese. Otherwise null.",
   "expression_tip": "If there is an interesting expression worth explaining, write a brief explanation in Japanese. Otherwise null."
 }}

@@ -268,36 +268,6 @@ function showWelcome() {
 
 function useStarter(text) { textInput.value = text; sendMessage(); }
 
-// ===== Transcript Correction =====
-async function correctTranscript(rawText) {
-  // Show subtle hint that correction is in progress
-  speechPreview.textContent = "✨ 補正中...";
-  speechPreview.classList.remove("hidden");
-
-  try {
-    const res = await fetch("/api/correct", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: rawText }),
-    });
-    const data = await res.json();
-    const corrected = data.corrected || rawText;
-
-    // Only update if user hasn't manually edited the input yet
-    if (textInput.value.trim() === rawText && corrected !== rawText) {
-      textInput.value = corrected;
-      speechPreview.textContent = `📝 補正: "${rawText}" → "${corrected}"`;
-    } else {
-      speechPreview.classList.add("hidden");
-      return;
-    }
-  } catch {
-    // Silently fail — keep raw text as-is
-  }
-
-  setTimeout(() => speechPreview.classList.add("hidden"), 3000);
-}
-
 // ===== Send =====
 async function sendMessage() {
   // Stop recording if active
@@ -374,6 +344,8 @@ function addAIMessage(data) {
   let content = `<div class="ai-english">${escapeHtml(data.english)}</div>`;
   if (data.japanese_translation)
     content += `<div class="ai-translation">${escapeHtml(data.japanese_translation)}</div>`;
+  if (data.corrected_input)
+    content += `<div class="ai-correction">📝 音声補正: ${escapeHtml(data.corrected_input)}</div>`;
   if (data.correction)
     content += `<div class="ai-correction">${escapeHtml(data.correction)}</div>`;
   if (data.expression_tip)
@@ -461,7 +433,9 @@ function setupSpeechRecognition() {
 
   // Restart automatically if still recording (handles browser auto-stop on silence)
   recognition.onend = () => {
-    if (isRecording) recognition.start();
+    if (isRecording) {
+      try { recognition.start(); } catch (_) {}
+    }
   };
 
   recognition.onerror = (e) => {
@@ -485,9 +459,6 @@ function toggleRecording() {
     voiceStatus.classList.add("hidden");
     speechPreview.classList.add("hidden");
     textInput.focus();
-
-    const rawText = textInput.value.trim();
-    if (rawText) correctTranscript(rawText);
   } else {
     textInput.value = "";
     isRecording = true;
