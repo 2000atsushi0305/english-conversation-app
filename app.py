@@ -2,7 +2,8 @@ import os
 import json
 import re
 import sqlite3
-from datetime import date
+import contextlib
+from datetime import date, timedelta
 from flask import Flask, request, jsonify, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from google import genai
@@ -11,6 +12,8 @@ import stripe
 
 app = Flask(__name__, static_folder="public")
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 
 _gemini_client = None
 
@@ -28,7 +31,49 @@ STRIPE_PRICE_IDS = {
     "premium": os.environ.get("STRIPE_PREMIUM_PRICE_ID", ""),
 }
 
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
 DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
+
+if DATABASE_URL:
+    import psycopg2
+    import psycopg2.extras
+
+
+class _PgConn:
+    """psycopg2 を sqlite3 風に使えるようにする薄いラッパー。"""
+    def __init__(self, conn, cur):
+        self._conn = conn
+        self._cur = cur
+
+    def execute(self, sql, params=()):
+        self._cur.execute(sql.replace("?", "%s"), params)
+        return self._cur
+
+    def commit(self):
+        self._conn.commit()
+
+
+@contextlib.contextmanager
+def get_db():
+    if DATABASE_URL:
+        url = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        conn = psycopg2.connect(url)
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        try:
+            yield _PgConn(conn, cur)
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            cur.close()
+            conn.close()
+    else:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+        finally:
+            conn.close()
 
 FREE_MONTHLY_LIMIT = 30
 
@@ -81,14 +126,23 @@ Important: Always return valid JSON only, no other text."""
 
 # ── Database ───────────────────────────────────────────────────────────────────
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
 def init_db():
-    with get_db() as conn:
-        conn.execute("""
+    if DATABASE_URL:
+        create_sql = """
+            CREATE TABLE IF NOT EXISTS users (
+                id                     BIGSERIAL PRIMARY KEY,
+                email                  TEXT UNIQUE NOT NULL,
+                password_hash          TEXT NOT NULL,
+                created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                plan                   TEXT DEFAULT 'free',
+                usage_count            INTEGER DEFAULT 0,
+                usage_reset_at         DATE DEFAULT (date_trunc('month', CURRENT_DATE)::date),
+                stripe_customer_id     TEXT,
+                stripe_subscription_id TEXT
+            )
+        """
+    else:
+        create_sql = """
             CREATE TABLE IF NOT EXISTS users (
                 id                     INTEGER PRIMARY KEY AUTOINCREMENT,
                 email                  TEXT UNIQUE NOT NULL,
@@ -100,7 +154,9 @@ def init_db():
                 stripe_customer_id     TEXT,
                 stripe_subscription_id TEXT
             )
-        """)
+        """
+    with get_db() as conn:
+        conn.execute(create_sql)
         conn.commit()
     # マイグレーション: 既存 DB に Stripe カラムがなければ追加
     with get_db() as conn:
@@ -108,7 +164,7 @@ def init_db():
             try:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col_def}")
                 conn.commit()
-            except sqlite3.OperationalError:
+            except Exception:
                 pass  # すでに存在する
 
 def get_current_user():
@@ -186,10 +242,13 @@ def register():
             )
             conn.commit()
             user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        session.permanent = True
         session["user_id"] = user["id"]
         return jsonify({"ok": True, **user_to_dict(user)})
-    except sqlite3.IntegrityError:
-        return jsonify({"error": "このメールアドレスは既に登録されています"}), 409
+    except Exception as e:
+        if "unique" in str(e).lower() or "duplicate" in str(e).lower():
+            return jsonify({"error": "このメールアドレスは既に登録されています"}), 409
+        raise
 
 
 @app.route("/api/login", methods=["POST"])
@@ -204,6 +263,7 @@ def login():
     if not user or not check_password_hash(user["password_hash"], password):
         return jsonify({"error": "メールアドレスまたはパスワードが違います"}), 401
 
+    session.permanent = True
     session["user_id"] = user["id"]
     user = reset_usage_if_needed(user)
     return jsonify({"ok": True, **user_to_dict(user)})
@@ -379,7 +439,7 @@ def correct():
 
     try:
         response = get_gemini().models.generate_content(
-            model="models/gemini-2.5-flash",
+            model="models/gemini-2.0-flash",
             contents=(
                 "Fix obvious transcription errors (wrong homophones, misheard words, missing words) "
                 "in the English text. Preserve the speaker's meaning and natural speaking style. "
@@ -429,7 +489,7 @@ def chat():
         ]
 
         response = get_gemini().models.generate_content(
-            model="models/gemini-2.5-flash",
+            model="models/gemini-2.0-flash",
             contents=contents,
             config=gtypes.GenerateContentConfig(
                 system_instruction=build_system_prompt(theme, difficulty),
