@@ -75,7 +75,8 @@ def get_db():
         finally:
             conn.close()
 
-FREE_MONTHLY_LIMIT = 30
+FREE_MONTHLY_LIMIT     = 30
+LIGHT_MONTHLY_LIMIT    = 600
 
 # ── Conversation settings ──────────────────────────────────────────────────────
 
@@ -194,9 +195,10 @@ def reset_usage_if_needed(user):
     return user
 
 def get_limit(plan):
-    """premium は無制限（None）、それ以外は FREE_MONTHLY_LIMIT。"""
     if plan == "premium":
-        return None  # 無制限
+        return None             # 無制限
+    if plan == "light":
+        return LIGHT_MONTHLY_LIMIT
     return FREE_MONTHLY_LIMIT
 
 def user_to_dict(user):
