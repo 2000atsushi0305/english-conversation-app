@@ -300,6 +300,16 @@ async function correctTranscript(rawText) {
 
 // ===== Send =====
 async function sendMessage() {
+  // Stop recording if active
+  if (isRecording) {
+    isRecording = false;
+    recognition.stop();
+    micBtn.classList.remove("recording");
+    micBtn.textContent = "🎙️";
+    voiceStatus.classList.add("hidden");
+    speechPreview.classList.add("hidden");
+  }
+
   const text = textInput.value.trim();
   if (!text) return;
 
