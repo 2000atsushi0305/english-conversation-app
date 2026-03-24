@@ -442,7 +442,7 @@ def correct():
 
     try:
         response = get_gemini().models.generate_content(
-            model="models/gemini-2.5-flash-preview-04-17",
+            model="models/gemini-1.5-flash",
             contents=(
                 "Fix obvious transcription errors (wrong homophones, misheard words, missing words) "
                 "in the English text. Preserve the speaker's meaning and natural speaking style. "
@@ -492,7 +492,7 @@ def chat():
         ]
 
         response = get_gemini().models.generate_content(
-            model="models/gemini-2.5-flash-preview-04-17",
+            model="models/gemini-1.5-flash",
             contents=contents,
             config=gtypes.GenerateContentConfig(
                 system_instruction=build_system_prompt(theme, difficulty),
