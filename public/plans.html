@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI英会話 - プラン</title>
+  <title>TalkBoba - プラン</title>
   <link rel="stylesheet" href="/public/style.css">
 </head>
 <body class="auth-body">
@@ -11,7 +11,7 @@
   <div class="plans-container">
     <div class="plans-header">
       <a href="/" class="plans-back">← 戻る</a>
-      <h1>🎙️ AI英会話</h1>
+      <h1><img src="/public/boba-icon.svg" style="width:36px;height:36px;vertical-align:middle;margin-right:6px;"> TalkBoba</h1>
       <p>シンプルな料金プラン</p>
     </div>
 
@@ -22,56 +22,55 @@
         <div class="plan-name">無料プラン</div>
         <div class="plan-price">¥0<span>/月</span></div>
         <ul class="plan-features">
-          <li>✅ 月30回まで会話</li>
+          <li>✅ 月 30 boba 🧋</li>
+          <li>✅ ミルクボバ + 抹茶ボバ</li>
           <li>✅ 全テーマ利用可能</li>
-          <li>✅ 全難易度対応</li>
           <li>✅ 文法チェック</li>
           <li>✅ 音声入力・読み上げ</li>
-          <li class="plan-disabled">❌ 月30回を超える利用</li>
+          <li class="plan-disabled">❌ 自然な音声（ブラウザ標準）</li>
         </ul>
         <a href="/" class="plan-btn plan-btn-secondary">このまま使う</a>
       </div>
 
       <!-- Standard -->
-      <div class="plan-card">
+      <div class="plan-card plan-card-featured">
+        <div class="plan-badge">おすすめ</div>
         <div class="plan-name">スタンダード</div>
         <div class="plan-price">¥480<span>/月</span></div>
         <ul class="plan-features">
-          <li>✅ <strong>月600回まで会話</strong>（1日20回）</li>
-          <li>✅ 全テーマ利用可能</li>
-          <li>✅ 全難易度対応</li>
-          <li>✅ 文法チェック</li>
-          <li>✅ 音声入力・読み上げ</li>
-          <li>✅ 1日あたり¥16</li>
+          <li>✅ <strong>月 300 boba 🧋</strong>（1日 10 boba）</li>
+          <li>✅ <strong>全6キャラ解放</strong></li>
+          <li>✅ <strong>自然な音声で会話</strong></li>
+          <li>✅ 文法チェック・苦手分析</li>
+          <li>✅ 1日あたり ¥16</li>
         </ul>
-        <button class="plan-btn plan-btn-secondary" data-plan="light">アップグレード</button>
+        <button class="plan-btn plan-btn-primary" data-plan="light">アップグレード</button>
       </div>
 
       <!-- Premium -->
-      <div class="plan-card plan-card-featured">
-        <div class="plan-badge">おすすめ</div>
+      <div class="plan-card">
         <div class="plan-name">プレミアム</div>
         <div class="plan-price">¥980<span>/月</span></div>
         <ul class="plan-features">
-          <li>✅ <strong>会話回数 無制限</strong></li>
-          <li>✅ 全テーマ利用可能</li>
-          <li>✅ 全難易度対応</li>
-          <li>✅ 文法チェック</li>
-          <li>✅ 音声入力・読み上げ</li>
-          <li>✅ 毎日40回使っても¥33/日</li>
+          <li>✅ <strong>月 1,000 boba 🧋</strong>（1日 33 boba）</li>
+          <li>✅ 全6キャラ解放</li>
+          <li>✅ 自然な音声で会話</li>
+          <li>✅ 文法チェック・苦手分析</li>
+          <li>✅ 音声速度/ピッチ調整（予定）</li>
         </ul>
-        <button class="plan-btn plan-btn-primary" data-plan="premium">アップグレード</button>
+        <button class="plan-btn plan-btn-secondary" data-plan="premium">アップグレード</button>
       </div>
 
     </div>
 
     <p class="plans-note">
-      ※ 決済機能は準備中です。公開まで今しばらくお待ちください。
+      ※ プランはいつでもキャンセル可能です。<br>
+      <a href="/legal" style="color:var(--brown-2);font-size:0.85rem;">特定商取引法に基づく表記</a>
     </p>
   </div>
 
   <script>
-    document.querySelectorAll(".plan-btn-primary[data-plan]").forEach(btn => {
+    document.querySelectorAll(".plan-btn[data-plan]").forEach(btn => {
       btn.addEventListener("click", async () => {
         const plan = btn.dataset.plan;
         btn.disabled = true;

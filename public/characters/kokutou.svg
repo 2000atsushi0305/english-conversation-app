@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="kokutouBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7A5230"/>
+      <stop offset="100%" stop-color="#4A2F1C"/>
+    </linearGradient>
+  </defs>
+  <!-- leaf ears -->
+  <ellipse cx="18" cy="20" rx="9" ry="11" fill="url(#kokutouBody)" transform="rotate(-18 18 20)"/>
+  <ellipse cx="46" cy="20" rx="9" ry="11" fill="url(#kokutouBody)" transform="rotate(18 46 20)"/>
+  <!-- body -->
+  <circle cx="32" cy="40" r="22" fill="url(#kokutouBody)"/>
+  <!-- cheeks -->
+  <ellipse cx="18" cy="44" rx="5" ry="3.5" fill="#E8B4A0" opacity="0.85"/>
+  <ellipse cx="46" cy="44" rx="5" ry="3.5" fill="#E8B4A0" opacity="0.85"/>
+  <!-- eyes (a bit cocky) -->
+  <path d="M 22 35 Q 25.5 39 29 36" stroke="#3D2E1F" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M 35 36 Q 38.5 39 42 35" stroke="#3D2E1F" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <!-- smirk -->
+  <path d="M 27 47 Q 32 50 37 47" stroke="#3D2E1F" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- snapback cap (covers top + tilted visor) -->
+  <!-- crown -->
+  <path d="M 14 18 Q 14 4 32 4 Q 50 4 50 18 L 14 18 Z" fill="#1A1A1A"/>
+  <!-- visor tilted left -->
+  <path d="M 4 17 L 32 13 L 32 19 Z" fill="#0A0A0A"/>
+  <!-- cap accent stripe -->
+  <ellipse cx="32" cy="18" rx="18" ry="1.6" fill="#D4A256" opacity="0.6"/>
+  <!-- small white "B" logo -->
+  <circle cx="32" cy="11" r="2.2" fill="#fff" opacity="0.85"/>
+</svg>

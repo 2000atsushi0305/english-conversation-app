@@ -1,15 +1,26 @@
 # データベース（ユーザー情報が入るので除外）
 data.db
+app.db
 
 # Python
 __pycache__/
 *.py[cod]
 *.pyo
 .env
+.venv/
 
 # macOS
 .DS_Store
 
-# ログ
+# ログ（セッションログはローカル運用）
 logs/
 *.log
+
+# Claude Code セッションデータ
+.claude/
+
+# チームエージェント関連（個人ローカル運用）
+team/
+team_agent.py
+team_runner.py
+team_scheduler.py

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="milkBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D9B891"/>
+      <stop offset="100%" stop-color="#A07B52"/>
+    </linearGradient>
+  </defs>
+  <!-- leaf ears -->
+  <ellipse cx="18" cy="18" rx="9" ry="11" fill="url(#milkBody)" transform="rotate(-18 18 18)"/>
+  <ellipse cx="46" cy="18" rx="9" ry="11" fill="url(#milkBody)" transform="rotate(18 46 18)"/>
+  <ellipse cx="18" cy="20" rx="4" ry="6" fill="#F2C9B5" transform="rotate(-18 18 20)"/>
+  <ellipse cx="46" cy="20" rx="4" ry="6" fill="#F2C9B5" transform="rotate(18 46 20)"/>
+  <!-- body -->
+  <circle cx="32" cy="40" r="22" fill="url(#milkBody)"/>
+  <!-- sakura cheeks -->
+  <ellipse cx="18" cy="44" rx="5" ry="3.5" fill="#E8B4A0" opacity="0.85"/>
+  <ellipse cx="46" cy="44" rx="5" ry="3.5" fill="#E8B4A0" opacity="0.85"/>
+  <!-- eyes -->
+  <path d="M 22 36 Q 25.5 39 29 36" stroke="#3D2E1F" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M 35 36 Q 38.5 39 42 36" stroke="#3D2E1F" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <!-- smile -->
+  <path d="M 28 47 Q 32 50 36 47" stroke="#3D2E1F" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- tapioca pearls on top -->
+  <circle cx="24" cy="11" r="2.2" fill="#5A3E2A"/>
+  <circle cx="32" cy="8" r="2.6" fill="#5A3E2A"/>
+  <circle cx="40" cy="11" r="2.2" fill="#5A3E2A"/>
+</svg>

@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI英会話 - ログイン</title>
+  <title>TalkBoba - ログイン</title>
   <link rel="stylesheet" href="/public/style.css">
 </head>
 <body class="auth-body">
 
   <div class="auth-container">
     <div class="auth-logo">
-      <h1>🎙️ AI英会話</h1>
-      <p>AIと英語で話して、どんどん上達しよう</p>
+      <h1><img src="/public/boba-icon.svg" style="width:36px;height:36px;vertical-align:middle;margin-right:6px;"> TalkBoba</h1>
+      <p>Bobaと英語で話して、どんどん上達しよう</p>
     </div>
 
     <div class="auth-card">
@@ -52,6 +52,7 @@
           </div>
         </div>
         <div id="register-error" class="auth-error hidden"></div>
+        <div id="ref-banner" class="ref-banner hidden">🎁 紹介コード適用中！登録で+70回ボーナス</div>
         <button type="submit" class="auth-submit">登録してはじめる</button>
         <p class="auth-note">無料プランで月30回まで利用できます。</p>
       </form>
@@ -59,6 +60,17 @@
   </div>
 
   <script>
+    // 紹介コードをURLから取得
+    const _refCode = new URLSearchParams(location.search).get("ref") || "";
+    if (_refCode) {
+      // 新規登録タブを自動選択
+      document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+      document.querySelector('[data-tab="register"]').classList.add("active");
+      document.getElementById("login-form").classList.add("hidden");
+      document.getElementById("register-form").classList.remove("hidden");
+      document.getElementById("ref-banner").classList.remove("hidden");
+    }
+
     // Tab switching
     document.querySelectorAll(".auth-tab").forEach(tab => {
       tab.addEventListener("click", () => {
@@ -132,6 +144,7 @@
       const { res, data } = await postJSON("/api/register", {
         email:    document.getElementById("reg-email").value,
         password: document.getElementById("reg-password").value,
+        ref_code: _refCode,
       });
       if (data.ok) {
         location.href = "/";

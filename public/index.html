@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI英会話</title>
+  <title>TalkBoba</title>
+  <link rel="icon" type="image/svg+xml" href="/public/boba-icon.svg">
+  <link rel="manifest" href="/public/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TalkBoba">
+  <link rel="apple-touch-icon" href="/public/boba-icon.svg">
   <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
@@ -11,45 +17,118 @@
 
     <header>
       <div class="header-left">
-        <h1>🎙️ AI英会話</h1>
+        <h1><img src="/public/boba-icon.svg" class="logo-icon" alt="Boba"> TalkBoba</h1>
       </div>
       <div class="header-right">
-        <div id="usage-badge" class="usage-badge hidden" title="今月の残り回数"></div>
-        <button id="history-btn" class="icon-btn" title="会話履歴">📚</button>
-        <button id="settings-btn" class="icon-btn" title="設定">⚙️</button>
-        <button id="logout-btn" class="icon-btn" title="ログアウト">👤</button>
+        <div id="usage-badge" class="usage-badge hidden" title="クリックで成長を確認" onclick="openStatsModal()"></div>
+        <button id="menu-btn" class="hamburger-btn" aria-label="メニューを開く" aria-expanded="false" aria-controls="drawer">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </header>
 
-    <!-- Settings Panel -->
-    <div id="settings-panel" class="settings-panel hidden">
-      <div class="settings-row">
-        <label class="settings-label">テーマ</label>
-        <select id="theme-select" class="settings-select">
-          <option value="daily">💬 日常会話</option>
-          <option value="travel">✈️ 旅行</option>
-          <option value="business">💼 ビジネス</option>
-          <option value="hobbies">🎮 趣味・エンタメ</option>
-          <option value="food">🍜 食べ物・料理</option>
-          <option value="movies">🎬 映画・音楽</option>
-        </select>
+    <!-- Drawer (right-slide) -->
+    <div id="drawer-overlay" class="drawer-overlay hidden" aria-hidden="true"></div>
+    <aside id="drawer" class="drawer hidden" aria-hidden="true" aria-label="メインメニュー">
+      <div class="drawer-header">
+        <span class="drawer-title">メニュー</span>
+        <button id="drawer-close" class="drawer-close" aria-label="メニューを閉じる">✕</button>
       </div>
-      <div class="settings-row">
-        <label class="settings-label">難易度</label>
-        <div class="diff-buttons">
-          <button class="diff-btn" data-level="beginner">初級</button>
-          <button class="diff-btn active" data-level="intermediate">中級</button>
-          <button class="diff-btn" data-level="advanced">上級</button>
+      <div class="drawer-body">
+
+        <!-- Character picker -->
+        <div class="drawer-section-label">🫧 ボバを選ぶ</div>
+        <div id="character-picker" class="character-picker">
+          <div class="character-picker-loading">読み込み中…</div>
+        </div>
+
+        <!-- Settings -->
+        <div class="drawer-section-label">⚙️ 設定</div>
+        <div id="settings-panel">
+          <div class="settings-row">
+            <label class="settings-label">難易度</label>
+            <div class="diff-buttons">
+              <button class="diff-btn" data-level="beginner">初級</button>
+              <button class="diff-btn active" data-level="intermediate">中級</button>
+              <button class="diff-btn" data-level="advanced">上級</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <label class="settings-label">名前</label>
+            <input type="text" id="nickname-input" class="settings-select"
+              placeholder="例: Hanako" autocomplete="off" />
+          </div>
+          <div class="settings-row">
+            <label class="settings-label">📬 リマインダー</label>
+            <div class="notify-toggle-wrap">
+              <label class="toggle-label">
+                <input type="checkbox" id="notify-toggle">
+                <span id="notify-label">毎日の一言を受け取る</span>
+              </label>
+            </div>
+          </div>
+          <button id="new-chat-btn" class="btn-new-chat">🔄 新しい会話を始める</button>
+          <!-- 旧: テーマ select / 読み上げ select は廃止（welcome pill と Chirp 3 で代替）。
+               app.js の参照を残すため非表示で保持 -->
+          <select id="theme-select" hidden>
+            <option value="daily">daily</option>
+            <option value="travel">travel</option>
+            <option value="business">business</option>
+            <option value="hobbies">hobbies</option>
+            <option value="food">food</option>
+            <option value="movies">movies</option>
+          </select>
+          <select id="voice-select" hidden></select>
+        </div>
+
+        <!-- Links -->
+        <div class="drawer-section-label">🔗 そのほか</div>
+        <div class="drawer-links">
+          <button id="history-btn" class="drawer-link-item" type="button">📚 会話履歴</button>
+          <a href="/plans" class="drawer-link-item">⭐ プランを確認</a>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSek_mohLHWWHXxB3xbZxAx-GnXdNYeh3Uek6ipWe-d49BLfJA/viewform?usp=publish-editor" target="_blank" rel="noopener" class="drawer-link-item">📬 改善要望・ご意見</a>
+          <button id="logout-btn" class="drawer-link-item drawer-link-danger" type="button">👤 ログアウト</button>
+        </div>
+
+        <!-- Dev: plan switcher -->
+        <div class="drawer-section-label">🛠️ プラン切替（テスト用）</div>
+        <div class="dev-plan-switcher" id="dev-plan-switcher">
+          <button class="dev-plan-btn" data-plan="free">無料</button>
+          <button class="dev-plan-btn" data-plan="light">スタンダード</button>
+          <button class="dev-plan-btn" data-plan="premium">プレミアム</button>
+        </div>
+        <p class="dev-plan-note">本番では非表示にする予定。Stripeを通さず即時切替・利用回数リセット。</p>
+
+        <!-- Footer (small links) -->
+        <div class="drawer-footer">
+          <a href="/landing">Web</a>
+          <span>·</span>
+          <a href="/legal">利用規約</a>
         </div>
       </div>
-      <button id="new-chat-btn" class="btn-new-chat">🔄 新しい会話を始める</button>
-    </div>
+    </aside>
 
     <!-- Session info bar -->
     <div id="session-info" class="session-info hidden">
       <span id="session-theme-label"></span>
       <span class="session-sep">・</span>
       <span id="session-diff-label"></span>
+    </div>
+
+    <!-- AI Character (CSS製、表情・mood・talking 動作あり、色はキャラ連動) -->
+    <div id="ai-character" class="char-of-milk">
+      <div class="char-body">
+        <div class="char-ear left"></div>
+        <div class="char-ear right"></div>
+        <div class="char-face">
+          <div class="char-eyes">
+            <div class="char-eye"></div>
+            <div class="char-eye"></div>
+          </div>
+          <div class="char-mouth"></div>
+        </div>
+      </div>
+      <div class="char-label">Boba</div>
     </div>
 
     <!-- Chat -->
@@ -59,16 +138,16 @@
 
     <!-- Input -->
     <div id="input-area">
-      <div id="voice-status" class="voice-status hidden">
-        <span class="recording-dot"></span> 聞いています… もう一度押すと送信
-      </div>
+      <div id="voice-status" class="voice-status hidden"></div>
       <div class="input-row">
-        <input type="text" id="text-input"
+        <textarea id="text-input"
           placeholder="英語を入力 または 🎙️ で音声入力"
-          autocomplete="off" />
+          autocomplete="off" rows="1"></textarea>
+        <button id="hint-btn" class="btn btn-hint" title="返し方のヒント">💡</button>
         <button id="send-btn" class="btn btn-send" title="送信">➤</button>
         <button id="mic-btn" class="btn btn-mic" title="押して録音 → もう一度押して送信">🎙️</button>
       </div>
+      <div id="hint-chips" class="hint-chips hidden"></div>
       <div id="speech-preview" class="speech-preview hidden"></div>
     </div>
 
@@ -78,7 +157,6 @@
         <input type="checkbox" id="tts-toggle" checked>
         <span>読み上げ</span>
       </label>
-      <select id="voice-select"></select>
     </div>
 
   </div><!-- .container -->
@@ -92,6 +170,116 @@
         <button id="history-close" class="icon-btn">✕</button>
       </div>
       <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 あなたの成長</h2>
+        <button id="stats-close" class="icon-btn">✕</button>
+      </div>
+      <div id="stats-body"></div>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="review-modal" class="modal hidden">
+    <div class="modal-content review-modal-content">
+      <div class="modal-header">
+        <h2>📝 今日の振り返り</h2>
+        <button id="review-close" class="icon-btn">✕</button>
+      </div>
+      <p class="review-subtitle">今日使えた表現をおさらいしよう</p>
+      <div id="review-cards"></div>
+      <button id="review-done-btn" class="btn-review-done">新しい会話を始める →</button>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="modal hidden">
+    <div class="modal-content" style="padding:24px;">
+      <div class="modal-header">
+        <h2>TalkBobaはどうでしたか？</h2>
+        <button onclick="closeFeedback()" class="icon-btn">✕</button>
+      </div>
+      <div class="feedback-stars" id="feedback-stars">
+        <span class="fstar" data-v="1">★</span>
+        <span class="fstar" data-v="2">★</span>
+        <span class="fstar" data-v="3">★</span>
+        <span class="fstar" data-v="4">★</span>
+        <span class="fstar" data-v="5">★</span>
+      </div>
+      <textarea id="feedback-comment" class="feedback-comment" placeholder="一言コメント（任意）" rows="2"></textarea>
+      <button class="ob-btn" onclick="submitFeedback()">送信</button>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal -->
+  <div id="onboarding-overlay" class="onboarding-overlay hidden">
+    <div class="onboarding-modal">
+
+      <!-- Step 1: Welcome -->
+      <div class="ob-step" id="ob-step-1">
+        <div class="ob-char">
+          <div class="char-body">
+            <div class="char-ear left"></div>
+            <div class="char-ear right"></div>
+            <div class="char-face">
+              <div class="char-eyes"><div class="char-eye"></div><div class="char-eye"></div></div>
+              <div class="char-mouth"></div>
+            </div>
+          </div>
+        </div>
+        <h2 class="ob-title">TalkBobaへようこそ！</h2>
+        <p class="ob-desc">AIと英語で話せる会話練習アプリです。<br>まず簡単な設定をしましょう。</p>
+        <button class="ob-btn" onclick="obNext(2)">はじめる →</button>
+      </div>
+
+      <!-- Step 2: Nickname -->
+      <div class="ob-step hidden" id="ob-step-2">
+        <div class="ob-icon">👤</div>
+        <h2 class="ob-title">あなたの名前は？</h2>
+        <p class="ob-desc">AIが会話中に呼びかけます（英語名推奨）</p>
+        <input type="text" id="ob-nickname" class="ob-input" placeholder="例: Hanako" maxlength="20" autocomplete="off">
+        <button class="ob-btn" onclick="obNext(3)">次へ →</button>
+        <button class="ob-skip" onclick="obNext(3)">スキップ</button>
+      </div>
+
+      <!-- Step 3: Theme & Difficulty -->
+      <div class="ob-step hidden" id="ob-step-3">
+        <div class="ob-icon">🎯</div>
+        <h2 class="ob-title">テーマと難易度を選ぼう</h2>
+        <p class="ob-desc">あとでいつでも変更できます</p>
+        <div class="ob-field">
+          <label class="ob-label">テーマ</label>
+          <select id="ob-theme" class="ob-select">
+            <option value="daily">💬 日常会話</option>
+            <option value="travel">✈️ 旅行</option>
+            <option value="business">💼 ビジネス</option>
+            <option value="hobbies">🎮 趣味・エンタメ</option>
+            <option value="food">🍜 食べ物・料理</option>
+            <option value="movies">🎬 映画・音楽</option>
+          </select>
+        </div>
+        <div class="ob-field">
+          <label class="ob-label">難易度</label>
+          <div class="ob-diff-btns">
+            <button class="ob-diff-btn" data-level="beginner" onclick="obSelectDiff(this)">初級</button>
+            <button class="ob-diff-btn ob-diff-active" data-level="intermediate" onclick="obSelectDiff(this)">中級</button>
+            <button class="ob-diff-btn" data-level="advanced" onclick="obSelectDiff(this)">上級</button>
+          </div>
+        </div>
+        <button class="ob-btn" onclick="obFinish()">会話を始める！</button>
+      </div>
+
+      <!-- Progress dots -->
+      <div class="ob-dots">
+        <span class="ob-dot ob-dot-active" id="ob-dot-1"></span>
+        <span class="ob-dot" id="ob-dot-2"></span>
+        <span class="ob-dot" id="ob-dot-3"></span>
+      </div>
     </div>
   </div>
 
